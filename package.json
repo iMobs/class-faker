@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint src test --ext .js,.ts"
   },
   "peerDependencies": {
     "@faker-js/faker": ">=6"
