@@ -5,7 +5,8 @@
     "declaration": true,
     "outDir": "./dist",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "types": ["jest", "reflect-metadata"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]
