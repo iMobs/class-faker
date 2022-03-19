@@ -7,6 +7,7 @@ const config: Config.InitialOptions = {
       tsconfig: './tsconfig.json',
     },
   },
+  setupFilesAfterEnv: ['reflect-metadata'],
 };
 
 export default config;
