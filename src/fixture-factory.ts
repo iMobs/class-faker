@@ -1,4 +1,5 @@
 import faker from '@faker-js/faker';
+import mergeDeep from 'merge-deep';
 
 import {
   FixtureMeta,
@@ -8,69 +9,100 @@ import {
 
 type Class<T = any> = new (...args: unknown[]) => T;
 
-export class FixtureFactory {
-  public build<T extends Class>(classType: T) {
-    const result = {
-      one: () => {
-        return this.make(classType);
-      },
-      many: (x: number) => {
-        return Array(x).fill(result.one());
-      },
-    };
-
-    return result;
-  }
-
-  public make<T extends Class>(classType: T): T {
-    const fixtures: FixtureMeta[] | undefined = Reflect.getMetadata(
-      METADATA_KEY,
-      classType,
-    );
-
-    if (!fixtures) {
-      throw new Error(`${classType.name} has no registered fixtures`);
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
     }
+  : T;
 
-    const object = new classType();
-
-    for (const fixture of fixtures) {
-      const value = this.makeProperty(fixture.type, fixture.options);
-
-      // if (!(value instanceof fixture.type)) {
-      //   throw new TypeError(
-      //     `Invalid type, got ${typeof value} not ${fixture.type.name}`,
-      //   );
+export function FixtureFactory<T extends Class, R = InstanceType<T>>(
+  classType: T,
+) {
+  const result = {
+    one: (): R => {
+      return make(classType);
+    },
+    many: (x: number): R[] => {
+      return Array(x).map(() => result.one());
+    },
+    with: (input: DeepPartial<R>): R => {
+      // if (Array.isArray(input)) {
+      //   return mergeDeep(result.many(input.length), input);
       // }
 
-      object[fixture.propertyKey] = value;
-    }
+      return mergeDeep(result.one(), input);
+    },
+  };
 
-    return object;
+  return result;
+}
+
+function make<T extends Class>(classType: T) {
+  const fixtures: FixtureMeta[] | undefined = Reflect.getMetadata(
+    METADATA_KEY,
+    classType,
+  );
+
+  if (!fixtures) {
+    throw new Error(`${classType.name} has no registered fixtures`);
   }
 
-  private makeProperty(type: any, options?: FixtureOptions): unknown {
-    if (typeof options === 'function') {
-      return options(faker);
-    }
+  const object = new classType();
 
-    if (typeof options === 'string') {
-      return faker.fake(options);
-    }
+  for (const fixture of fixtures) {
+    const value = makeProperty(fixture.type, fixture.options);
 
-    switch (type) {
-      case Boolean:
-        return faker.datatype.boolean();
-      case Date:
-        return faker.datatype.datetime();
-      case Number:
-        return faker.datatype.number();
-      case Object:
-        return this.make(type);
-      case String:
-        return faker.datatype.string();
-      default:
-        return this.make(type);
+    // if (!(value instanceof fixture.type)) {
+    //   throw new TypeError(
+    //     `Invalid type, got ${typeof value} not ${fixture.type.name}`,
+    //   );
+    // }
+
+    object[fixture.propertyKey] = value;
+  }
+
+  return object;
+}
+
+function makeProperty(propertyType: any, options?: FixtureOptions) {
+  if (typeof options === 'function') {
+    return options(faker);
+  }
+
+  if (typeof options === 'string') {
+    return faker.fake(options);
+  }
+
+  const type = options?.type?.();
+
+  if (type) {
+    if (Array.isArray(type)) {
+      return Array(
+        faker.datatype.number({
+          min: options.minCount,
+          max: options.maxCount,
+        }),
+      ).map(() => makeProperty(type[0], options));
     }
+  }
+
+  if (options?.enum) {
+    return faker.random.arrayElement(Object.values(options.enum));
+  }
+
+  const min = options?.minValue;
+  const max = options?.maxValue;
+
+  switch (type ?? propertyType) {
+    case Boolean:
+      return faker.datatype.boolean();
+    case Date:
+      return faker.datatype.datetime({ min, max });
+    case Number:
+      return faker.datatype.number({ min, max });
+    case String:
+      return faker.datatype.string(max);
+    default:
+      return make(propertyType);
   }
 }

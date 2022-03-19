@@ -13,18 +13,12 @@ export type FixtureOptions =
   | ((faker: Faker) => unknown)
   | (() => unknown)
   | {
-      type: () => typeof Number;
-      min?: number;
-      max?: number;
-    }
-  | {
-      type: () => typeof Date;
-      min?: Date;
-      max?: Date;
-    }
-  | {
-      type: () => object;
+      type?: () => any;
       enum?: object;
+      minCount?: number;
+      maxCount?: number;
+      minValue?: number;
+      maxValue?: number;
     };
 
 export function Fixture(options?: FixtureOptions): PropertyDecorator {
