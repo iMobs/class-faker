@@ -7,7 +7,7 @@ import {
   METADATA_KEY,
 } from './decorators/fixture';
 
-type Class<T = any> = new (...args: unknown[]) => T;
+type Class<T> = new (...args: any) => T;
 
 type DeepPartial<T> = T extends object
   ? {
@@ -15,29 +15,23 @@ type DeepPartial<T> = T extends object
     }
   : T;
 
-export function FixtureFactory<T extends Class, R = InstanceType<T>>(
-  classType: T,
-) {
-  const result = {
-    one: (): R => {
-      return make(classType);
-    },
-    many: (x: number): R[] => {
-      return Array(x).map(() => result.one());
-    },
-    with: (input: DeepPartial<R>): R => {
-      // if (Array.isArray(input)) {
-      //   return mergeDeep(result.many(input.length), input);
-      // }
-
-      return mergeDeep(result.one(), input);
-    },
-  };
-
-  return result;
+interface FixtureFactory<T> {
+  one: () => T;
+  many: (length: number) => T[];
+  merge: (input: DeepPartial<T>) => T;
 }
 
-function make<T extends Class>(classType: T) {
+export function makeFixtureFactory<T>(classType: Class<T>): FixtureFactory<T> {
+  const one = (): T => make(classType);
+  const many = (length: number): T[] => Array.from({ length }, one);
+  const merge = (input: DeepPartial<T>): T => {
+    return mergeDeep(one(), input);
+  };
+
+  return { one, many, merge };
+}
+
+function make<T>(classType: Class<T>): T {
   const fixtures: FixtureMeta[] | undefined = Reflect.getMetadata(
     METADATA_KEY,
     classType,
@@ -64,7 +58,7 @@ function make<T extends Class>(classType: T) {
   return object;
 }
 
-function makeProperty(propertyType: any, options?: FixtureOptions) {
+function makeProperty(propertyType: any, options?: FixtureOptions): unknown {
   if (typeof options === 'function') {
     return options(faker);
   }
@@ -77,12 +71,11 @@ function makeProperty(propertyType: any, options?: FixtureOptions) {
 
   if (type) {
     if (Array.isArray(type)) {
-      return Array(
-        faker.datatype.number({
-          min: options.minCount,
-          max: options.maxCount,
-        }),
-      ).map(() => makeProperty(type[0], options));
+      const length = faker.datatype.number({
+        min: options.minCount,
+        max: options.maxCount,
+      });
+      return Array.from({ length }, () => makeProperty(type[0], options));
     }
   }
 

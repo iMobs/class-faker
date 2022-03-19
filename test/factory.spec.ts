@@ -1,6 +1,6 @@
 import faker from '@faker-js/faker';
 
-import { Fixture, FixtureFactory } from '../src';
+import { Fixture, makeFixtureFactory } from '../src';
 
 describe('FixtureFactory', () => {
   describe('#one', () => {
@@ -9,7 +9,7 @@ describe('FixtureFactory', () => {
         prop: string;
       }
 
-      expect(() => FixtureFactory(Test).one()).toThrowError(
+      expect(() => makeFixtureFactory(Test).one()).toThrowError(
         `Test has no registered fixtures`,
       );
     });
@@ -22,7 +22,7 @@ describe('FixtureFactory', () => {
             prop: boolean;
           }
 
-          const result = FixtureFactory(Test).one();
+          const result = makeFixtureFactory(Test).one();
           expect(result).toHaveProperty('prop');
           expect(typeof result.prop).toBe('boolean');
         });
@@ -35,7 +35,7 @@ describe('FixtureFactory', () => {
             prop: Date;
           }
 
-          const result = FixtureFactory(Test).one();
+          const result = makeFixtureFactory(Test).one();
           expect(result).toHaveProperty('prop');
           expect(result.prop).toBeInstanceOf(Date);
         });
@@ -49,7 +49,7 @@ describe('FixtureFactory', () => {
             prop: Date;
           }
 
-          const result = FixtureFactory(Test).one();
+          const result = makeFixtureFactory(Test).one();
           expect(result.prop.getTime()).toBeGreaterThanOrEqual(minValue);
           expect(result.prop.getTime()).toBeLessThanOrEqual(maxValue);
         });
@@ -84,7 +84,7 @@ describe('FixtureFactory', () => {
           bar: Bar;
         }
 
-        const foo = FixtureFactory(Foo).one();
+        const foo = makeFixtureFactory(Foo).one();
         expect(foo.bar).toBeInstanceOf(Bar);
         expect(foo.bar.baz).toBe('test');
       });
@@ -96,14 +96,14 @@ describe('FixtureFactory', () => {
   });
 
   describe('#many', () => {
-    it.skip('creates an array of fixtures', () => {
+    it('creates an array of fixtures', () => {
       class Test {
         @Fixture('test')
         value: string;
       }
 
       const count = faker.datatype.number({ min: 1, max: 10 });
-      const result = FixtureFactory(Test).many(count);
+      const result = makeFixtureFactory(Test).many(count);
 
       expect(result).toHaveLength(count);
       for (const fixture of result) {
@@ -113,7 +113,7 @@ describe('FixtureFactory', () => {
     });
   });
 
-  describe('#with', () => {
+  describe('#merge', () => {
     it('creates a deeply merged fixture', () => {
       class Bar {
         @Fixture('test')
@@ -131,7 +131,7 @@ describe('FixtureFactory', () => {
         other: string;
       }
 
-      const result = FixtureFactory(Foo).with({
+      const result = makeFixtureFactory(Foo).merge({
         other: 'override',
         bar: {
           other: 'nested override',
