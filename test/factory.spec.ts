@@ -96,7 +96,7 @@ describe('FixtureFactory', () => {
   });
 
   describe('#many', () => {
-    it('creates an array of fixtures', () => {
+    it.skip('creates an array of fixtures', () => {
       class Test {
         @Fixture('test')
         value: string;
