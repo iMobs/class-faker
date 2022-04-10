@@ -16,7 +16,7 @@
   "devDependencies": {
     "@commitlint/cli": "16.2.3",
     "@commitlint/config-conventional": "16.2.1",
-    "@faker-js/faker": "6.0.0",
+    "@faker-js/faker": "6.1.2",
     "@tsconfig/node16": "1.0.2",
     "@types/jest": "27.4.1",
     "@types/merge-deep": "3.0.0",
