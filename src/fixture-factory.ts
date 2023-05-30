@@ -7,7 +7,7 @@ import {
   METADATA_KEY,
 } from './decorators/fixture';
 
-type Class<T> = new (...args: any) => T;
+type Class<T> = new (...args: unknown[]) => T;
 
 type DeepPartial<T> = T extends object
   ? {
@@ -58,7 +58,7 @@ function make<T>(classType: Class<T>): T {
   return object;
 }
 
-function makeProperty(propertyType: any, options?: FixtureOptions): unknown {
+function makeProperty(propertyType: unknown, options?: FixtureOptions): unknown {
   if (typeof options === 'function') {
     return options(faker);
   }
@@ -100,6 +100,6 @@ function makeProperty(propertyType: any, options?: FixtureOptions): unknown {
     case String:
       return faker.string.sample(max);
     default:
-      return make(propertyType);
+      return make(propertyType as Class<unknown>);
   }
 }
