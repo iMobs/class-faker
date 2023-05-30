@@ -58,7 +58,10 @@ function make<T>(classType: Class<T>): T {
   return object;
 }
 
-function makeProperty(propertyType: unknown, options?: FixtureOptions): unknown {
+function makeProperty(
+  propertyType: unknown,
+  options?: FixtureOptions,
+): unknown {
   if (typeof options === 'function') {
     return options(faker);
   }
@@ -71,7 +74,7 @@ function makeProperty(propertyType: unknown, options?: FixtureOptions): unknown 
 
   if (type) {
     if (Array.isArray(type)) {
-      const length = faker.datatype.number({
+      const length = faker.number.int({
         min: options.minCount,
         max: options.maxCount,
       });
@@ -92,11 +95,11 @@ function makeProperty(propertyType: unknown, options?: FixtureOptions): unknown 
     case Date:
       if (min && max) {
         return faker.date.between({ from: min, to: max });
-      } else { 
+      } else {
         return faker.date.recent();
       }
     case Number:
-      return faker.number.float({ min, max })
+      return faker.number.float({ min, max });
     case String:
       return faker.string.sample(max);
     default:
