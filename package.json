@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "lint": "eslint src test --ext .js,.ts"
+    "lint": "eslint src test --ext .js,.ts",
+    "prepare": "husky install"
   },
   "peerDependencies": {
     "@faker-js/faker": ">=6"
@@ -25,7 +26,7 @@
     "eslint": "8.41.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-import": "2.27.5",
-    "husky": "7.0.4",
+    "husky": "^8.0.3",
     "jest": "29.5.0",
     "lint-staged": "13.2.2",
     "prettier": "2.8.8",
