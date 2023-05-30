@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 
 import { Fixture, makeFixtureFactory } from '../src';
 
@@ -102,7 +102,7 @@ describe('FixtureFactory', () => {
         value: string;
       }
 
-      const count = faker.datatype.number({ min: 1, max: 10 });
+      const count = faker.number.int({ min: 1, max: 10 });
       const result = makeFixtureFactory(Test).many(count);
 
       expect(result).toHaveLength(count);

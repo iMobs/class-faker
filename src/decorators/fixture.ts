@@ -5,7 +5,7 @@ export const METADATA_KEY = Symbol('FIXTURES');
 export interface FixtureMeta {
   propertyKey: string | symbol;
   options?: FixtureOptions;
-  type: any;
+  type: unknown;
 }
 
 export type FixtureOptions =
@@ -13,7 +13,7 @@ export type FixtureOptions =
   | ((faker: Faker) => unknown)
   | (() => unknown)
   | {
-      type?: () => any;
+      type?: () => unknown;
       enum?: object;
       minCount?: number;
       maxCount?: number;

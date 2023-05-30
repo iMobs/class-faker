@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import mergeDeep from 'merge-deep';
 
 import {
@@ -64,7 +64,7 @@ function makeProperty(propertyType: any, options?: FixtureOptions): unknown {
   }
 
   if (typeof options === 'string') {
-    return faker.fake(options);
+    return faker.helpers.fake(options);
   }
 
   const type = options?.type?.();
@@ -80,7 +80,7 @@ function makeProperty(propertyType: any, options?: FixtureOptions): unknown {
   }
 
   if (options?.enum) {
-    return faker.random.arrayElement(Object.values(options.enum));
+    return faker.helpers.arrayElement(Object.values(options.enum));
   }
 
   const min = options?.minValue;
@@ -90,11 +90,15 @@ function makeProperty(propertyType: any, options?: FixtureOptions): unknown {
     case Boolean:
       return faker.datatype.boolean();
     case Date:
-      return faker.datatype.datetime({ min, max });
+      if (min && max) {
+        return faker.date.between({ from: min, to: max });
+      } else { 
+        return faker.date.recent();
+      }
     case Number:
-      return faker.datatype.number({ min, max });
+      return faker.number.float({ min, max })
     case String:
-      return faker.datatype.string(max);
+      return faker.string.sample(max);
     default:
       return make(propertyType);
   }
