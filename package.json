@@ -15,8 +15,8 @@
     "@faker-js/faker": ">=6"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.6.5",
-    "@commitlint/config-conventional": "17.6.5",
+    "@commitlint/cli": "17.8.1",
+    "@commitlint/config-conventional": "17.8.1",
     "@faker-js/faker": "^8.0.2",
     "@tsconfig/node16": "16.1.0",
     "@types/jest": "29.5.1",
